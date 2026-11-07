@@ -1,0 +1,42 @@
+# ===== 7 PM Stock Health Check — รายชื่อที่ติดตาม =====
+# group:  index = ดัชนี | th = หุ้นไทย | dr = DR (คำนวณจากหุ้นแม่ ตาม underlying)
+# status: accumulate = ถืออยู่และอยากสะสมเพิ่ม (เตือนทั้งความเสี่ยงและจังหวะสะสม)
+#         holding    = ถืออย่างเดียว (เน้นเตือนความเสี่ยง)
+#         waiting    = รอซื้อ (ใส่ buy_zone: [ต่ำ, สูง] ได้)
+# buy_zone ใส่ให้ตัวไหนก็ได้ (ไม่บังคับ) เช่น  buy_zone: [36, 38]
+
+stocks:
+  - {symbol: SET,      name: SET Index,        group: index, status: accumulate}
+  - {symbol: NASDAQ,   name: NASDAQ Composite, group: index, status: accumulate, underlying: "^IXIC"}
+  - {symbol: BCP,      name: บางจาก,            group: th, status: accumulate}
+  - {symbol: PTT,      name: ปตท.,              group: th, status: accumulate}
+  - {symbol: PTTEP,    name: ปตท.สผ.,           group: th, status: accumulate}
+  - {symbol: GULF,     name: กัลฟ์ ดีเวลลอปเมนท์, group: th, status: accumulate}
+  - {symbol: KKP,      name: เกียรตินาคินภัทร,     group: th, status: accumulate}
+  - {symbol: KTB,      name: กรุงไทย,           group: th, status: accumulate}
+  - {symbol: SCB,      name: SCB X,            group: th, status: accumulate}
+  - {symbol: WHA,      name: ดับบลิวเอชเอ,       group: th, status: accumulate}
+  - {symbol: AMATA,    name: อมตะ,             group: th, status: accumulate}
+  - {symbol: ADVANC,   name: แอดวานซ์ อินโฟร์,    group: th, status: accumulate}
+  - {symbol: "TRUE",     name: ทรู คอร์ปอเรชั่น,    group: th, status: accumulate}
+  - {symbol: TFG,      name: ไทยฟู้ดส์,          group: th, status: accumulate}
+  - {symbol: LH,       name: แลนด์แอนด์เฮ้าส์,     group: th, status: accumulate}
+  - {symbol: TAIWAN19, name: Taiwan Top 50 ETF, group: dr, status: accumulate, underlying: "0050.TW"}
+  - {symbol: NVDA01,   name: NVIDIA,           group: dr, status: accumulate, underlying: NVDA}
+  - {symbol: AMD80,    name: AMD,              group: dr, status: accumulate, underlying: AMD}
+  - {symbol: GOOG80,   name: Alphabet,         group: dr, status: accumulate, underlying: GOOG}
+  - {symbol: TSLA80,   name: Tesla,            group: dr, status: accumulate, underlying: TSLA}
+
+# ===== เกณฑ์การแจ้งเตือน (ปรับได้) =====
+settings:
+  drop_alert_pct: 3.0        # หุ้น: ลง >= 3% ในวันเดียว = ลงแรงผิดปกติ
+  drop_alert_pct_index: 2.0  # ดัชนี: ลง >= 2%
+  rsi_period: 14
+  rsi_overbought: 70
+  rsi_oversold: 30
+  trend_fast_ema: 50
+  trend_slow_ema: 200
+  volume_spike_x: 2.0
+  near_buy_zone_pct: 3.0
+  send_when_no_alert: true   # วันที่ไม่มีเรื่องสำคัญ ยังส่งแจ้งเตือนสั้น ๆ ไหม
+  history_days: 120          # จำนวนวันที่เก็บไว้วาดกราฟใน Dashboard
