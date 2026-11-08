@@ -243,14 +243,14 @@ function render(){
       <button class="row" data-open="${esc(x.symbol)}" data-sym="${esc(x.symbol)}" style="--z:${zc(x.zone)}">
         <span class="bar"></span>
         <span style="min-width:0"><span class="l1"><span class="sym">${esc(x.symbol)}</span><span class="nm">${esc(x.name)}</span></span>
-          <span class="l2"><span>${SHORT[x.zone]} ${x.flags.bullish?'Bullish':'Bearish'}</span><span>RSI ${fmt(x.rsi,0)}</span><span>${TREND[x.trend]||x.trend}</span></span>
+          <span class="l2"><span>${SHORT[x.zone]} ${x.flags.bullish?'Bullish':'Bearish'}</span><span>RSI ${fmt(x.rsi,0)}</span>${x.srsi_k!=null?`<span>Stoch ${fmt(x.srsi_k,0)}/${fmt(x.srsi_d,0)}</span>`:""}<span>${TREND[x.trend]||x.trend}</span></span>
           <span class="strip" aria-hidden="true">${x.hist.z.slice(-20).map(z=>`<i style="--z:${zc(z)}"></i>`).join("")}</span></span>
         <span class="r"><span class="px">${fmt(x.close,dec(x))}</span><br>${pct(x.chg_pct)}</span>
       </button>`).join("")}</div>`;}).join("");
 
   $("#foot").innerHTML = `แถบสีเล็กใต้ชื่อหุ้นคือโซน CDC ย้อนหลัง 20 วันทำการ (ขวาสุด = วันนี้)<br>
     ราคาจาก Yahoo Finance และ set.or.th · DR คำนวณจากหุ้นแม่ (ราคาแสดงเป็นสกุลของหุ้นแม่)<br>
-    ดัชนี SET มีเฉพาะราคาปิด CDC จึงคำนวณจากราคาปิดแทน OHLC4<br>
+    CDC ActionZone V3 ตั้งค่า ${esc(d.settings?.cdc||"close 12 26 1")} และ Stoch RSI ${esc(d.settings?.srsi||"3 3 14 14")} ตรงกับ TradingView<br>
     ระบบนี้ช่วยคัดกรอง ไม่ใช่คำแนะนำการลงทุน`;
   applyFilter();
 }
@@ -285,7 +285,7 @@ function openSheet(sym){
     : `<div class="note" style="margin-top:0">${x.stale ? "ยังไม่มีแท่งใหม่ของตลาดนี้ (เช่น ตลาดต่างประเทศปิด) จึงไม่แจ้งสัญญาณซ้ำ" : "วันนี้ไม่มีสัญญาณเปลี่ยน"}</div>`;
   const notes = [];
   if (x.group==="dr") notes.push(`คำนวณจากหุ้นแม่ ${esc(x.ticker)} ข้อมูล ณ ราคาปิด ${thDate(x.as_of)}`);
-  if (x.close_only) notes.push("มีเฉพาะราคาปิด CDC จึงคำนวณจากราคาปิด อาจต่างจาก TradingView ได้เล็กน้อย");
+  if (x.close_only && !(DATA.settings?.cdc||"close").startsWith("close")) notes.push("ดัชนีนี้มีเฉพาะราคาปิด CDC จึงคำนวณจากราคาปิด");
   $("#sheetbody").innerHTML = `
     <div class="grab"></div>
     <div class="sh-head"><div><div class="sym">${esc(x.symbol)}</div><div class="muted">${esc(x.name)}</div></div>
@@ -295,17 +295,22 @@ function openSheet(sym){
     <h2 style="margin-top:18px">ย้อนหลัง ${x.hist.c.length} วันทำการ</h2>
     <div class="chart" id="chart"></div>
     <div class="series-key"><span><i></i>ราคาปิด</span><span><i style="border-top-color:var(--ink-2);border-top-width:1.5px"></i>Fast EMA12</span><span><i style="border-top:1.5px dashed var(--muted)"></i>Slow EMA26</span></div>
+    ${x.hist.k ? `<h2 style="margin-top:18px">Stoch RSI</h2><div class="chart" id="schart"></div>
+    <div class="series-key"><span><i></i>K</span><span><i style="border-top:1.5px dashed var(--muted)"></i>D</span><span>เส้นประจาง = ${SRL()} / ${SRU()}</span></div>` : ""}
     <dl class="facts">
       <div><dt>CDC</dt><dd>${x.state==="BUY"?"Buy":"Sell"} ${x.days_in_state<=1?"เริ่มวันนี้":"มาแล้ว "+x.days_in_state+" วัน"}</dd></div>
       <div><dt>RSI (14)</dt><dd>${fmt(x.rsi,1)}${x.rsi>=70?" ร้อนแรง":x.rsi<=30?" ขายมากเกิน":""}</dd></div>
       <div><dt>Trend</dt><dd>${TREND[x.trend]||x.trend}</dd></div>
       <div><dt>EMA50 / EMA200</dt><dd>${fmt(x.ema50,2)} / ${x.ema200==null?"-":fmt(x.ema200,2)}</dd></div>
+      <div><dt>Stoch RSI K / D</dt><dd>${x.srsi_k==null?"-":fmt(x.srsi_k,1)+" / "+fmt(x.srsi_d,1)}${x.srsi_d==null?"":x.srsi_d>=SRU()?" ร้อนแรง":x.srsi_d<=SRL()?" ขายมากเกิน":""}</dd></div>
+      <div><dt>ตั้งค่า</dt><dd style="font-weight:500;font-size:13px">CDC ${esc(DATA.settings?.cdc||"close 12 26 1")}<br>Stoch RSI ${esc(DATA.settings?.srsi||"3 3 14 14")}</dd></div>
     </dl>
     <div class="note">${notes.join("<br>")}${notes.length?"<br>":""}แหล่งข้อมูล ${esc(x.source)} (${esc(x.ticker)})</div>
     <div style="text-align:center;margin-top:16px"><button class="close" id="closesheet">ปิด</button></div>`;
   const dlg = $("#sheet");
   dlg.showModal();
   drawChart($("#chart"), x);
+  if (x.hist.k) drawStoch($("#schart"), x);
   $("#closesheet").onclick = () => dlg.close();
 }
 
@@ -344,6 +349,21 @@ function drawChart(el, x){
   const hide = () => { xh.setAttribute("visibility","hidden"); tip.style.display="none"; };
   svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
   svg.addEventListener("pointerleave", hide);
+}
+
+const SRU = () => DATA.settings?.srsi_upper ?? 80, SRL = () => DATA.settings?.srsi_lower ?? 20;
+function drawStoch(el, x){
+  const W = Math.max(280, el.clientWidth || 340), H = 110, padL = 4, padR = 46, padT = 6, padB = 6;
+  const k = x.hist.k, d = x.hist.sd, n = k.length;
+  const X = i => padL + i*(W-padL-padR)/(n-1), Y = v => padT + (100-v)/100*(H-padT-padB);
+  const path = arr => { let p="", pen=false; arr.forEach((v,i)=>{ if(v==null){pen=false;return;} p += `${pen?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; pen=true; }); return p; };
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟ Stoch RSI ${esc(x.symbol)}">
+    <rect x="${padL}" y="${Y(SRU())}" width="${W-padL-padR}" height="${Y(SRL())-Y(SRU())}" fill="var(--surface-2)"/>
+    ${[SRU(),SRL()].map(t=>`<line x1="${padL}" x2="${W-padR}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-dasharray="3 3"/>
+      <text x="${W-padR+6}" y="${Y(t)+4}" fill="var(--muted)" font-size="11">${t}</text>`).join("")}
+    <path d="${path(d)}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <path d="${path(k)}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+  </svg>`;
 }
 
 /* ---------- events ---------- */
