@@ -35,6 +35,9 @@ import yaml
 BKK = ZoneInfo("Asia/Bangkok")
 HERE = Path(__file__).resolve().parent
 DATA_JSON = HERE / "docs" / "data.json"
+# ราคาปิดดัชนี SET ย้อนหลัง (จาก set.or.th 10 ก.พ. 2568 – 6 พ.ย. 2569) ใช้ตั้งต้น เมื่อ set.or.th บล็อกเครื่องของ GitHub
+SET_SEED = "20250210:1270.49,20250211:1283.97,20250213:1284.11,20250214:1272.1,20250217:1256.48,20250218:1257.48,20250219:1262.27,20250220:1245.61,20250221:1246.21,20250224:1235.85,20250225:1206.39,20250226:1231.14,20250227:1215.73,20250228:1203.72,20250303:1188.41,20250304:1177.64,20250305:1206.96,20250306:1189.55,20250307:1202.03,20250310:1177.44,20250311:1187.63,20250312:1160.06,20250313:1159.64,20250314:1173.76,20250317:1170.2,20250318:1176.17,20250319:1189.66,20250320:1181.71,20250321:1186.61,20250324:1190.06,20250325:1184.93,20250326:1190.36,20250327:1187.9,20250328:1175.45,20250331:1158.09,20250401:1168.02,20250402:1172.69,20250403:1161.81,20250404:1125.21,20250408:1074.59,20250409:1088.18,20250410:1133.95,20250411:1128.66,20250416:1138.9,20250417:1141.28,20250418:1150.95,20250421:1134.71,20250422:1144.05,20250423:1153.77,20250424:1146.86,20250425:1159,20250428:1159.53,20250429:1171.12,20250430:1197.26,20250502:1198.98,20250506:1187.86,20250507:1220.27,20250508:1206.59,20250509:1210.94,20250513:1214.39,20250514:1216.71,20250515:1194.49,20250516:1195.77,20250519:1187.06,20250520:1189.14,20250521:1179.81,20250522:1173.37,20250523:1176.36,20250526:1178.43,20250527:1163.42,20250528:1160.74,20250529:1164.01,20250530:1149.18,20250604:1132.02,20250605:1140.63,20250606:1136.43,20250609:1135.24,20250610:1139.16,20250611:1141.58,20250612:1128.62,20250613:1122.7,20250616:1114.49,20250617:1113.58,20250618:1094.58,20250619:1068.73,20250620:1067.63,20250623:1062.78,20250624:1100.01,20250625:1107.69,20250626:1106.73,20250627:1082.42,20250630:1089.56,20250701:1110.01,20250702:1115.69,20250703:1127.21,20250704:1119.94,20250707:1123,20250708:1115.65,20250709:1110.4,20250711:1121.13,20250714:1143.31,20250715:1161.01,20250716:1157.63,20250717:1198.11,20250718:1206.58,20250721:1208.13,20250722:1191.75,20250723:1219.62,20250724:1212.49,20250725:1217.15,20250729:1233.68,20250730:1244.14,20250731:1242.35,20250801:1218.33,20250804:1229.4,20250805:1246.96,20250806:1264.47,20250807:1265.15,20250808:1259.07,20250813:1277.43,20250814:1266.67,20250815:1259.42,20250818:1242.31,20250819:1235.76,20250820:1248.13,20250821:1244.79,20250822:1253.39,20250825:1262.67,20250826:1251.26,20250827:1248.03,20250828:1250.09,20250829:1236.61,20250901:1244.48,20250902:1248.78,20250903:1259.31,20250904:1252.55,20250905:1264.8,20250908:1266.11,20250909:1276.08,20250910:1278.05,20250911:1288.03,20250912:1293.62,20250915:1299.78,20250916:1308.19,20250917:1306.69,20250918:1297.01,20250919:1292.72,20250922:1282.54,20250923:1273.2,20250924:1278.41,20250925:1288.26,20250926:1278.74,20250929:1288.07,20250930:1274.17,20251001:1275.03,20251002:1288.29,20251003:1293.61,20251006:1285.64,20251007:1305.24,20251008:1304.92,20251009:1313.99,20251010:1286.98,20251014:1266.38,20251015:1286.69,20251016:1291.46,20251017:1274.61,20251020:1284.47,20251021:1290.72,20251022:1302.35,20251024:1313.91,20251027:1323.52,20251028:1314.28,20251029:1315.64,20251030:1314.65,20251031:1309.5,20251103:1308.86,20251104:1298.6,20251105:1295.29,20251106:1313.31,20251107:1302.91,20251110:1306.26,20251111:1300.47,20251112:1284.81,20251113:1287.44,20251114:1269.26,20251117:1280.07,20251118:1270.04,20251119:1272.17,20251120:1281.81,20251121:1254.4,20251124:1252.73,20251125:1268.78,20251126:1261.18,20251127:1252.71,20251128:1256.69,20251201:1276.57,20251202:1277.58,20251203:1274.82,20251204:1273.77,20251208:1261.39,20251209:1269.87,20251211:1253.54,20251212:1254.1,20251215:1273.4,20251216:1260.68,20251217:1256.85,20251218:1250.07,20251219:1252.19,20251222:1269.68,20251223:1271.11,20251224:1275.33,20251225:1264.77,20251226:1259.25,20251229:1254.03,20251230:1259.67,20260105:1280.05,20260106:1274.75,20260107:1280.82,20260108:1253.6,20260109:1254.09,20260112:1242.2,20260113:1235.3,20260114:1244.3,20260115:1261.39,20260116:1275.6,20260119:1283.2,20260120:1296.37,20260121:1317.56,20260122:1311.64,20260123:1314.39,20260126:1307.07,20260127:1334.45,20260128:1338.9,20260129:1331.07,20260130:1325.62,20260202:1321.42,20260203:1336.11,20260204:1346.54,20260205:1346.23,20260206:1354.01,20260209:1400.89,20260210:1410.44,20260211:1411.7,20260212:1441.53,20260213:1430.41,20260216:1438.09,20260217:1459.68,20260218:1466.67,20260219:1493.91,20260220:1479.71,20260223:1480.24,20260224:1490.4,20260225:1516.01,20260226:1533.64,20260227:1528.26,20260302:1466.51,20260304:1384.61,20260305:1417.29,20260306:1410.37,20260309:1382.97,20260310:1405.76,20260311:1407.34,20260312:1429.8,20260313:1409.35,20260316:1405.02,20260317:1433.88,20260318:1440.85,20260319:1417.45,20260320:1432.99,20260323:1397.34,20260324:1410.39,20260325:1457.91,20260326:1442.92,20260327:1447.05,20260330:1449.62,20260331:1448.14,20260401:1470.99,20260402:1465.72,20260403:1454,20260407:1464.43,20260408:1485.03,20260409:1489.66,20260410:1506.84,20260416:1489.73,20260417:1482.45,20260420:1481.85,20260421:1483.5,20260422:1479.74,20260423:1461.35,20260424:1456.1,20260427:1479.13,20260428:1480.2,20260429:1491.74,20260430:1493.69,20260505:1490.1,20260506:1516.91,20260507:1507.53,20260508:1500.36,20260511:1489.29,20260512:1483.56,20260513:1517.26,20260514:1539.12,20260515:1517.95,20260518:1517.74,20260519:1516.69,20260520:1528.43,20260521:1532.67,20260522:1538.67,20260525:1550.33,20260526:1553.36,20260527:1570.95,20260528:1568.97,20260529:1568.37,20260602:1588.06,20260604:1594.79,20260605:1582.6,20260608:1561.68,20260609:1584.14,20260610:1563.59,20260611:1572.32,20260612:1592.41,20260615:1591.72,20260616:1588.05,20260617:1587.07,20260618:1585.06,20260619:1572.5,20260622:1574.13,20260623:1540.9,20260624:1548.22,20260625:1558.55,20260626:1542.34,20260629:1577.81,20260630:1591.24,20260701:1588.23,20260702:1593.56,20260703:1611.28,20260706:1616.88,20260707:1604.13,20260708:1576.25,20260709:1608.3,20260710:1621.55,20260713:1627.9,20260714:1626.03,20260715:1630.21,20260716:1635.29,20260717:1639.04,20260720:1646,20260721:1652.97,20260722:1639.34,20260723:1641.03,20260724:1644.39,20260727:1624.47,20260730:1598.11,20260731:1623.64,20260803:1621.9,20260804:1617.13,20260805:1609.78,20260806:1614.64,20260807:1612,20260810:1624.36,20260811:1612.62,20260813:1614.36,20260814:1609.06,20260817:1626.44,20260818:1621.62,20260819:1609.76,20260820:1609.99,20260821:1613.78,20260824:1601.05,20260825:1596.01,20260826:1601.92,20260827:1600.7,20260828:1588.22,20260831:1595.16,20260901:1588.68,20260902:1575.07,20260903:1576.92,20260904:1595.58,20260907:1618.82,20260908:1621.89,20260909:1617.89,20260910:1615.07,20260911:1604.52,20260914:1591.07,20260915:1578.66,20260916:1562.73,20260917:1583.34,20260918:1584.15,20260921:1598.03,20260922:1604.44,20260923:1610.7,20260924:1602.58,20260925:1607.63,20260928:1602.37,20260929:1594.3,20260930:1559.01,20261001:1563.91,20261002:1571.62,20261005:1576.45,20261006:1582.22,20261007:1584.63,20261008:1570.61,20261009:1577.65,20261012:1571.74,20261014:1575.88,20261015:1573.01,20261019:1571.72,20261020:1554.94,20261021:1556.09,20261022:1562.67,20261026:1579.03,20261027:1575.02,20261028:1566.1,20261029:1544.6,20261030:1518.59,20261102:1507.2,20261103:1491.01,20261104:1502.09,20261105:1497.99,20261106:1465.7"
+PREV_RAW: dict = {}
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
 
 # ════════════════════════ Indicators ════════════════════════
@@ -42,9 +45,10 @@ def ema(s: pd.Series, n: int) -> pd.Series:
     return s.ewm(span=n, adjust=False).mean()
 
 
-def cdc_action_zone_v3(df: pd.DataFrame, fast: int = 12, slow: int = 26) -> pd.DataFrame:
+def cdc_action_zone_v3(df: pd.DataFrame, fast: int = 12, slow: int = 26, smooth: int = 1, source: str = "close") -> pd.DataFrame:
     """CDC Action Zone V3 (piriya33)
-    src=OHLC4, AP=EMA(src,2), Fast=EMA(AP,12), Slow=EMA(AP,26)
+    src=ราคาตามที่ตั้ง (ค่าเริ่มต้น close), AP=EMA(src,smooth) [smooth=1 = ไม่ทำให้เรียบ], Fast=EMA(AP,12), Slow=EMA(AP,26)
+    ตรงกับ TradingView "CDC ActionZone V3 2020 close 12 26 1"
       Bullish = Fast>Slow            Bearish = Fast<Slow
       Green   = Bull & AP>Fast       Red     = Bear & AP<Fast
       Yellow  = Bull & AP<Fast & AP>Slow   (Dip)
@@ -54,8 +58,9 @@ def cdc_action_zone_v3(df: pd.DataFrame, fast: int = 12, slow: int = 26) -> pd.D
       Buy Alert  = แท่งแรกที่เป็น Green  |  Sell Alert = แท่งแรกที่เป็น Red
       สถานะ BUY/SELL = Alert ล่าสุดที่เกิด
     """
-    src = (df["Open"] + df["High"] + df["Low"] + df["Close"]) / 4
-    ap = ema(src, 2)
+    o, h, l, c = df["Open"], df["High"], df["Low"], df["Close"]
+    src = {"close": c, "ohlc4": (o + h + l + c) / 4, "hlc3": (h + l + c) / 3, "hl2": (h + l) / 2}.get(source, c)
+    ap = ema(src, smooth) if smooth > 1 else src
     f, s = ema(ap, fast), ema(ap, slow)
     bull, bear = f > s, f < s
     green = bull & (ap > f)
@@ -88,6 +93,15 @@ def rsi(close: pd.Series, n: int = 14) -> pd.Series:
     return (100 - 100 / (1 + rs)).fillna(100)
 
 
+def stoch_rsi(close: pd.Series, k: int = 3, d: int = 3, rsi_len: int = 14, stoch_len: int = 14):
+    """Stoch RSI แบบ TradingView: stoch(rsi, rsi, rsi, stoch_len) → K = SMA(…, k), D = SMA(K, d)"""
+    r = rsi(close, rsi_len)
+    lo, hi = r.rolling(stoch_len).min(), r.rolling(stoch_len).max()
+    st = (r - lo) / (hi - lo).replace(0, np.nan) * 100
+    kk = st.rolling(k).mean()
+    return kk, kk.rolling(d).mean()
+
+
 def trend(close: pd.Series, fast: int, slow: int) -> pd.Series:
     ef, es = ema(close, fast), ema(close, slow)
     t = pd.Series("Sideways", index=close.index, dtype=object)
@@ -105,8 +119,11 @@ def analyse(item: dict, df: pd.DataFrame, cfg: dict) -> dict:
     df = df.dropna(subset=["Close"]).copy()
     for c in ("Open", "High", "Low"):
         df[c] = df[c].fillna(df["Close"])
-    cdc = cdc_action_zone_v3(df)
+    cdc = cdc_action_zone_v3(df, cfg.get("cdc_fast", 12), cfg.get("cdc_slow", 26),
+                             cfg.get("cdc_smooth", 1), cfg.get("cdc_source", "close"))
     r = rsi(df["Close"], cfg["rsi_period"])
+    sk, sd = stoch_rsi(df["Close"], cfg.get("srsi_k", 3), cfg.get("srsi_d", 3),
+                       cfg.get("srsi_rsi_len", 14), cfg.get("srsi_stoch_len", 14))
     enough = len(df) >= cfg["trend_slow_ema"]
     tr = trend(df["Close"], cfg["trend_fast_ema"], cfg["trend_slow_ema"]) if enough \
         else pd.Series("n/a", index=df.index, dtype=object)
@@ -166,6 +183,17 @@ def analyse(item: dict, df: pd.DataFrame, cfg: dict) -> dict:
         A(2 if wants_more else 3, "🧊", f"RSI ลงเขต Oversold ({r0:.0f})",
           "ขายมากเกินไป — อาจใกล้เด้ง รอ CDC ยืนยันก่อนสะสม")
 
+    # 5b) Stoch RSI (เส้น K ตัดเส้น D ในโซนสุดขั้ว)
+    up_lv, lo_lv = cfg.get("srsi_upper", 80), cfg.get("srsi_lower", 20)
+    k0, k1, d0, d1 = sk.iloc[-1], sk.iloc[-2], sd.iloc[-1], sd.iloc[-2]
+    if not any(pd.isna(x) for x in (k0, k1, d0, d1)):
+        if k1 <= d1 and k0 > d0 and d0 < lo_lv:
+            A(2 if wants_more else 3, "🔼", f"Stoch RSI ตัดขึ้นในโซนต่ำ (K {k0:.0f} / D {d0:.0f})",
+              "แรงขายเริ่มหมด เด้งจากโซนขายมากเกิน — ดู CDC ประกอบก่อนสะสม")
+        elif k1 >= d1 and k0 < d0 and d0 > up_lv:
+            A(3, "🔽", f"Stoch RSI ตัดลงในโซนสูง (K {k0:.0f} / D {d0:.0f})",
+              "แรงซื้อเริ่มอ่อน — ไม่ควรไล่ซื้อเพิ่มช่วงนี้")
+
     # 6) Buy zone (ถ้าตั้งไว้)
     bz = item.get("buy_zone")
     if wants_more and bz:
@@ -196,6 +224,8 @@ def analyse(item: dict, df: pd.DataFrame, cfg: dict) -> dict:
             "red": z0 == "red", "orange": z0 == "orange", "yellow": z0 == "yellow",
         },
         "rsi": round(r0, 1), "trend": t0,
+        "srsi_k": None if pd.isna(sk.iloc[-1]) else round(float(sk.iloc[-1]), 1),
+        "srsi_d": None if pd.isna(sd.iloc[-1]) else round(float(sd.iloc[-1]), 1),
         "ema50": round(float(e50.iloc[-1]), 4), "ema200": round(float(e200.iloc[-1]), 4) if enough else None,
         "buy_zone": bz, "alerts": alerts,
         "hist": {
@@ -204,6 +234,8 @@ def analyse(item: dict, df: pd.DataFrame, cfg: dict) -> dict:
             "f": [round(float(x), 4) for x in cdc["fast"].iloc[-n:]],
             "s": [round(float(x), 4) for x in cdc["slow"].iloc[-n:]],
             "z": list(cdc["zone"].iloc[-n:]),
+            "k": [None if pd.isna(x) else round(float(x), 1) for x in sk.iloc[-n:]],
+            "sd": [None if pd.isna(x) else round(float(x), 1) for x in sd.iloc[-n:]],
         },
     }
 
@@ -252,14 +284,46 @@ def fetch_yahoo(ticker: str) -> tuple[pd.DataFrame, str]:
 SET_HDR = {"Referer": "https://www.set.or.th/th/market/index/set/overview", "Accept-Language": "th-TH,th;q=0.9"}
 
 
+def _set_series_to_df(d: list[str], c: list[float]) -> pd.DataFrame:
+    return pd.DataFrame({"Open": c, "High": c, "Low": c, "Close": c, "Volume": [0.0] * len(c)},
+                        index=pd.to_datetime(d), dtype=float)
+
+
 def fetch_set_index() -> pd.DataFrame:
-    """ดัชนี SET จาก set.or.th — มีเฉพาะราคาปิด (Yahoo ไม่มีประวัติดัชนี SET)"""
-    j = _get_json("https://www.set.or.th/api/set/index/SET/chart-quotation?period=5Y&accumulated=false", SET_HDR)
-    q = j["quotations"]
-    idx = pd.to_datetime([x["localDatetime"][:10] for x in q])
-    c = [x["price"] for x in q]
-    return pd.DataFrame({"Open": c, "High": c, "Low": c, "Close": c,
-                         "Volume": [x.get("volume") or 0 for x in q]}, index=idx, dtype=float)
+    """ดัชนี SET (มีเฉพาะราคาปิด)
+    1) ลอง set.or.th ก่อน  2) ถ้าถูกบล็อก: ใช้ประวัติที่เก็บไว้ (SET_SEED + data.json รอบก่อน)
+       แล้วต่อท้ายด้วยราคาปิดล่าสุดจาก Yahoo (^SET.BK มีแค่แท่งล่าสุด แต่พอสำหรับเติมวันละแท่ง)"""
+    try:
+        j = _get_json("https://www.set.or.th/api/set/index/SET/chart-quotation?period=5Y&accumulated=false", SET_HDR, tries=2)
+        q = j["quotations"]
+        series = {x["localDatetime"][:10]: float(x["price"]) for x in q}
+        src = "set.or.th"
+    except Exception as e:  # noqa: BLE001
+        print(f"[info] set.or.th ใช้ไม่ได้ ({e}) → ใช้ประวัติที่เก็บไว้ + Yahoo", file=sys.stderr)
+        series = {}
+        for tok in SET_SEED.split(","):
+            dd, cc = tok.split(":")
+            series[f"{dd[:4]}-{dd[4:6]}-{dd[6:]}"] = float(cc)
+        prev = PREV_RAW.get("set_index_series") or {}
+        for dd, cc in zip(prev.get("d", []), prev.get("c", [])):
+            series[dd] = float(cc)
+        src = "ประวัติที่เก็บไว้ + Yahoo"
+        try:
+            j = _get_json("https://query1.finance.yahoo.com/v8/finance/chart/%5ESET.BK?range=5d&interval=1d")
+            res = j["chart"]["result"][0]
+            ts, closes = res.get("timestamp") or [], res["indicators"]["quote"][0]["close"]
+            for t, c in zip(ts, closes):
+                if c:
+                    series[dt.datetime.fromtimestamp(t, BKK).strftime("%Y-%m-%d")] = round(float(c), 2)
+        except Exception as e2:  # noqa: BLE001
+            print(f"[warn] Yahoo ^SET.BK ใช้ไม่ได้ ({e2}) — ดัชนี SET จะเป็นข้อมูลของวันก่อน", file=sys.stderr)
+    d = sorted(series)
+    SET_STATE["series"] = {"d": d[-600:], "c": [series[x] for x in d[-600:]]}
+    SET_STATE["source"] = src
+    return _set_series_to_df(d, [series[x] for x in d])
+
+
+SET_STATE: dict = {}
 
 
 def fetch_set_stock(symbol: str) -> pd.DataFrame:
@@ -277,8 +341,9 @@ def fetch_item(item: dict) -> pd.DataFrame | None:
     sym, grp = item["symbol"], item.get("group")
     try:
         if sym == "SET":
-            item.update(_ticker="SET (set.or.th)", _source="set.or.th", _currency="pt", _close_only=True)
-            return fetch_set_index()
+            df = fetch_set_index()
+            item.update(_ticker="SET", _source=SET_STATE.get("source", "set.or.th"), _currency="pt", _close_only=True)
+            return df
         tk = yahoo_ticker(item)
         df, cur = fetch_yahoo(tk)
         item.update(_ticker=tk, _source="Yahoo Finance", _currency=cur or ("THB" if grp == "th" else ""))
@@ -418,9 +483,31 @@ def deliver(items, v, day) -> list[str]:
 # ════════════════════════ Main ════════════════════════
 def load_previous() -> dict:
     try:
-        return {x["symbol"]: x for x in json.loads(DATA_JSON.read_text(encoding="utf-8"))["items"]}
+        raw = json.loads(DATA_JSON.read_text(encoding="utf-8"))
+        if not raw.get("demo"):
+            PREV_RAW.update(raw)
+        return {x["symbol"]: x for x in raw["items"]}
     except Exception:  # noqa: BLE001
         return {}
+
+
+def ensure_site_assets():
+    """ไฟล์หน้าเว็บ: ถ้าอัปโหลดไฟล์ใหม่ไว้ที่หน้าแรกของ repo จะคัดลอกเข้า docs/ ให้ (เมื่อเนื้อหาต่างกัน)
+    และถ้า docs/ ยังไม่มีไฟล์ จะหาจาก docs/docs/ — แล้ว stage ให้ workflow commit"""
+    import shutil, subprocess
+    for f in ("index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"):
+        dst = HERE / "docs" / f
+        root, nested = HERE / f, HERE / "docs" / "docs" / f
+        src = None
+        if root.exists() and (not dst.exists() or root.read_bytes() != dst.read_bytes()):
+            src = root
+        elif not dst.exists() and nested.exists():
+            src = nested
+        if src:
+            shutil.copy2(src, dst)
+            print(f"[fix] คัดลอก {src.relative_to(HERE)} → docs/{f}")
+            if os.getenv("GITHUB_ACTIONS"):
+                subprocess.run(["git", "add", str(dst)], cwd=HERE, check=False)
 
 
 def main():
@@ -439,6 +526,8 @@ def main():
     today = now.date()
     prev = {} if args.demo else load_previous()
 
+    if not args.demo:
+        ensure_site_assets()
     if args.demo:
         while today.weekday() > 4:
             today -= dt.timedelta(days=1)
@@ -485,9 +574,15 @@ def main():
     payload = {
         "generated_at": now.isoformat(timespec="minutes"), "market_date": today.isoformat(),
         "demo": args.demo, "verdict": v, "missing": missing,
-        "settings": {k: cfg[k] for k in ("rsi_overbought", "rsi_oversold", "drop_alert_pct")},
+        "settings": {"rsi_overbought": cfg["rsi_overbought"], "rsi_oversold": cfg["rsi_oversold"],
+                     "drop_alert_pct": cfg["drop_alert_pct"], "srsi_upper": cfg.get("srsi_upper", 80),
+                     "srsi_lower": cfg.get("srsi_lower", 20),
+                     "cdc": f'{cfg.get("cdc_source", "close")} {cfg.get("cdc_fast", 12)} {cfg.get("cdc_slow", 26)} {cfg.get("cdc_smooth", 1)}',
+                     "srsi": f'{cfg.get("srsi_k", 3)} {cfg.get("srsi_d", 3)} {cfg.get("srsi_rsi_len", 14)} {cfg.get("srsi_stoch_len", 14)}'},
         "items": items,
     }
+    if SET_STATE.get("series"):
+        payload["set_index_series"] = SET_STATE["series"]
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

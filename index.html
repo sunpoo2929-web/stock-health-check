@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>7 PM Health Check</title>
+<meta name="theme-color" content="#151C27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Health Check">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#151C27; --surface:#1D2634; --surface-2:#263143; --line:#2F3B4F;
+  --ink:#EEF2F7; --ink-2:#AEB8C7; --muted:#8592A8; --on-zone:#0E1520;
+  --green:#34C77B; --red:#F25C66; --yellow:#F5CE52; --orange:#F59A4E; --blue:#5B8CFF; --lblue:#79D6F4; --none:#56627A;
+  --act:#F25C66; --watch:#F5CE52; --calm:#34C77B;
+  --r-lg:18px; --r-md:12px; --r-sm:8px;
+  --pad: max(16px, env(safe-area-inset-left));
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "IBM Plex Sans Thai",system-ui,-apple-system,sans-serif;
+  font-variant-numeric:tabular-nums;padding:env(safe-area-inset-top) var(--pad) calc(28px + env(safe-area-inset-bottom));}
+main{max-width:640px;margin:0 auto}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
+h2{font-size:17px;font-weight:600;margin:28px 0 10px}
+.muted{color:var(--muted)} .ink2{color:var(--ink-2)}
+
+/* header + verdict */
+header{padding:14px 0 4px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+header .app{font-weight:600;font-size:15px}
+header .when{font-size:13px;color:var(--muted);text-align:right}
+.verdict{margin-top:10px;padding:18px 18px 16px;border-radius:var(--r-lg);background:var(--surface);position:relative;overflow:hidden}
+.verdict::before{content:"";position:absolute;inset:0 auto 0 0;width:6px;background:var(--lvl)}
+.verdict .big{font-size:30px;line-height:1.2;font-weight:700;letter-spacing:-.01em}
+.verdict .sub{margin-top:4px;color:var(--ink-2)}
+.verdict .who{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--surface-2);font-size:13px;font-weight:500}
+.pill .sw{width:10px;height:10px;border-radius:3px;background:var(--z)}
+.demo{margin-top:10px;font-size:13px;padding:8px 12px;border-radius:var(--r-sm);background:#3A2F14;color:#F5DFA0}
+
+/* board */
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+@media (min-width:520px){.board{grid-template-columns:repeat(5,1fr)}}
+.tile{position:relative;background:var(--z);color:var(--on-zone);border-radius:var(--r-md);padding:9px 8px 8px;min-height:72px;
+  display:flex;flex-direction:column;justify-content:space-between;text-align:left;transition:opacity .2s, transform .15s}
+.tile:active{transform:scale(.97)}
+.tile .s{font-weight:700;font-size:14px;line-height:1.15;word-break:break-all}
+.tile .c{font-size:13px;font-weight:600}
+.tile .zn{font-size:11px;font-weight:500;opacity:.8}
+.tile.alert-1{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
+.tile .mark{position:absolute;bottom:7px;right:7px;font-size:13px;line-height:1}
+.tile .s.long{font-size:12.5px;letter-spacing:-.02em}
+.tile.dim{opacity:.18}
+.board-note{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* legend */
+.legend{display:grid;gap:12px}
+.lg-group .t{font-size:13px;color:var(--muted);margin-bottom:6px}
+.lg-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px}
+.chip .sw{width:12px;height:12px;border-radius:4px;background:var(--z);flex:none}
+.chip .glyph{font-size:12px;width:14px;text-align:center}
+.chip .n{font-weight:700;min-width:1ch}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.zero{opacity:.45}
+.filterbar{display:none;margin-top:10px;font-size:13px;align-items:center;gap:10px}
+.filterbar.on{display:flex}
+.filterbar button{text-decoration:underline;color:var(--ink-2)}
+
+/* alert cards */
+.cards{display:grid;gap:8px}
+.card{background:var(--surface);border-radius:var(--r-md);padding:12px 14px;display:grid;grid-template-columns:6px 1fr;column-gap:12px;text-align:left;width:100%}
+.card .bar{border-radius:3px;background:var(--z);grid-row:1 / span 3}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.card .sym{font-weight:700;font-size:16px}
+.card .px{font-weight:600}
+.card ul{margin:6px 0 0;padding:0;list-style:none;font-size:14px}
+.card li{display:flex;gap:6px}
+.card .act{margin-top:6px;font-size:13px;color:var(--ink-2)}
+.up{color:var(--green)} .dn{color:var(--red)}
+
+/* rows */
+.grp{font-size:13px;color:var(--muted);margin:14px 0 6px}
+.rows{background:var(--surface);border-radius:var(--r-md);overflow:hidden}
+.row{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 12px 10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .bar{align-self:stretch;background:var(--z);border-radius:0 3px 3px 0}
+.row .l1{display:flex;gap:8px;align-items:baseline}
+.row .sym{font-weight:700}
+.row .nm{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .l2{display:flex;gap:10px;font-size:12px;color:var(--ink-2);margin-top:2px;flex-wrap:wrap}
+.row .r{text-align:right}
+.row .r .px{font-weight:600}
+.strip{display:flex;gap:1px;margin-top:6px;height:6px}
+.strip i{flex:1;background:var(--z);border-radius:1px}
+.row.hide{display:none}
+
+/* sheet */
+dialog{border:0;padding:0;margin:auto auto 0;width:100%;max-width:640px;max-height:92vh;border-radius:22px 22px 0 0;background:var(--surface);color:var(--ink);
+  padding-bottom:env(safe-area-inset-bottom)}
+dialog::backdrop{background:rgba(5,8,14,.6)}
+dialog[open]{animation:rise .22s ease-out}
+@keyframes rise{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){dialog[open]{animation:none}.tile{transition:none}}
+.sheet{padding:10px 18px 22px;overflow:auto;max-height:92vh}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sh-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sh-head .sym{font-size:24px;font-weight:700;line-height:1.1}
+.sh-head .px{font-size:22px;font-weight:600;text-align:right}
+.close{padding:6px 12px;border-radius:999px;background:var(--surface-2);font-size:13px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.chart{position:relative;margin-top:6px;touch-action:pan-y}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:absolute;top:0;pointer-events:none;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 9px;font-size:12px;line-height:1.4;white-space:nowrap;display:none}
+.series-key{display:flex;gap:14px;font-size:12px;color:var(--ink-2);margin-top:6px}
+.series-key span{display:inline-flex;align-items:center;gap:6px}
+.series-key i{display:inline-block;width:16px;height:0;border-top:2px solid var(--ink)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-radius:var(--r-md);overflow:hidden;margin-top:14px}
+.facts div{background:var(--surface-2);padding:9px 12px}
+.facts dt{font-size:12px;color:var(--muted)} .facts dd{margin:0;font-weight:600}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+footer{margin-top:30px;font-size:12px;color:var(--muted);line-height:1.6}
+.empty{padding:16px;background:var(--surface);border-radius:var(--r-md);color:var(--ink-2)}
+</style>
+</head>
+<body>
+<main id="app">
+  <header><div class="app">7 PM Health Check</div><div class="when" id="when">กำลังโหลด…</div></header>
+  <section class="verdict" id="verdict" style="--lvl:var(--none)"><div class="big">กำลังโหลดข้อมูล</div></section>
+  <div id="demo"></div>
+
+  <div class="board" id="board" role="list" aria-label="สีโซน CDC ของทุกตัว"></div>
+  <div class="board-note">แตะช่องเพื่อดูกราฟและรายละเอียด ช่องที่มีกรอบขาวคือตัวที่ต้องดูวันนี้</div>
+
+  <h2>สถานะ CDC</h2>
+  <div class="legend" id="legend"></div>
+  <div class="filterbar" id="filterbar"><span id="filtertext"></span><button id="clearf">ล้างตัวกรอง</button></div>
+
+  <div id="sec-act"></div>
+  <div id="sec-watch"></div>
+
+  <h2>ทุกตัว</h2>
+  <div id="all"></div>
+
+  <footer id="foot"></footer>
+</main>
+
+<dialog id="sheet" aria-label="รายละเอียดหุ้น"><div class="sheet" id="sheetbody"></div></dialog>
+
+<script>
+const ZONES = {
+  green:{en:"Green",th:"เขียว"}, blue:{en:"Blue (Strong Rally)",th:"น้ำเงิน · เด้งแรง"},
+  lblue:{en:"Light Blue (Rally)",th:"ฟ้าอ่อน · เด้ง"}, red:{en:"Red",th:"แดง"},
+  orange:{en:"Orange (Strong Dip)",th:"ส้ม · ย่อแรง"}, yellow:{en:"Yellow (Dip)",th:"เหลือง · ย่อ"}, none:{en:"-",th:"-"}
+};
+const SHORT = {green:"เขียว",blue:"น้ำเงิน",lblue:"ฟ้าอ่อน",red:"แดง",orange:"ส้ม",yellow:"เหลือง",none:"-"};
+const LEGEND = [
+  {t:"สัญญาณที่เกิดวันนี้", items:[
+    {k:"buy_alert", label:"Buy Alert", glyph:"▲", color:"var(--green)", hint:"เพิ่งเปลี่ยนเป็นเขียววันนี้"},
+    {k:"sell_alert", label:"Sell Alert", glyph:"▼", color:"var(--red)", hint:"เพิ่งเปลี่ยนเป็นแดงวันนี้"}]},
+  {t:"แนวโน้ม (เส้น Fast เทียบ Slow)", items:[
+    {k:"bullish", label:"is Bullish", glyph:"↗", color:"var(--green)"},
+    {k:"bearish", label:"is Bearish", glyph:"↘", color:"var(--red)"}]},
+  {t:"โซนสี", items:["green","blue","lblue","red","orange","yellow"].map(z=>({k:z,label:"is "+ZONES[z].en,zone:z}))}
+];
+const GROUPS = {index:"ดัชนี", th:"หุ้นไทย", dr:"DR — คำนวณจากหุ้นแม่"};
+const TREND = {Uptrend:"↗ ขาขึ้น", Downtrend:"↘ ขาลง", Sideways:"→ ออกข้าง", "n/a":"ข้อมูลไม่พอ"};
+let DATA=null, FILTER=null;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = (v, d) => v==null ? "-" : Number(v).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const dec = () => 2;
+const pct = v => `<span class="${v>0?'up':v<0?'dn':''}">${v>0?'+':''}${fmt(v,2)}%</span>`;
+const zc = z => `var(--${z||'none'})`;
+const thDate = iso => new Date(iso+"T12:00:00+07:00").toLocaleDateString("th-TH",{weekday:"long",day:"numeric",month:"short",year:"numeric"});
+
+async function load(){
+  if (window.__DATA__) return window.__DATA__;
+  const r = await fetch("data.json?t="+Date.now(), {cache:"no-store"});
+  if (!r.ok) throw new Error("โหลด data.json ไม่ได้ ("+r.status+")");
+  return r.json();
+}
+
+function render(){
+  const d = DATA, items = d.items, v = d.verdict;
+  const gen = new Date(d.generated_at);
+  $("#when").innerHTML = `ราคาปิด ${thDate(d.market_date)}<br>อัปเดต ${gen.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})} น.`;
+
+  // verdict
+  const nAct = v.act.length, nWatch = v.watch.length;
+  const big = nAct ? `ต้องดู ${nAct} ตัว` : nWatch ? `ไม่มีเรื่องเร่งด่วน` : `วันนี้ไม่ต้องทำอะไร`;
+  const sub = nAct ? (nWatch ? `และมีจังหวะสะสม ${nWatch} ตัว` : `ไม่มีจังหวะสะสมใหม่`)
+            : nWatch ? `มีจังหวะสะสม ${nWatch} ตัว` : `ไม่มีสัญญาณเปลี่ยนในทุกตัว`;
+  const bySym = Object.fromEntries(items.map(x=>[x.symbol,x]));
+  const who = [...v.act, ...v.watch].map(s => { const x=bySym[s];
+    return `<button class="pill" data-open="${esc(s)}" style="--z:${zc(x.zone)}"><span class="sw"></span>${esc(s)} ${x.alerts[0].icon}</button>`;}).join("");
+  $("#verdict").style.setProperty("--lvl", `var(--${v.level})`);
+  $("#verdict").innerHTML = `<div class="big">${big}</div><div class="sub">${sub}</div>${who?`<div class="who">${who}</div>`:""}`;
+  $("#demo").innerHTML = d.demo ? `<div class="demo">ตัวอย่างจากข้อมูลจำลอง ยังไม่ใช่ราคาจริง</div>` :
+    (d.missing && d.missing.length ? `<div class="demo">วันนี้ดึงข้อมูลไม่ได้: ${d.missing.map(esc).join(", ")}</div>` : "");
+
+  // board
+  $("#board").innerHTML = items.map(x => {
+    const p = x.alerts[0]?.p;
+    return `<button class="tile ${p===1?'alert-1':''}" role="listitem" data-open="${esc(x.symbol)}" data-sym="${esc(x.symbol)}" style="--z:${zc(x.zone)}"
+      aria-label="${esc(x.symbol)} โซน${SHORT[x.zone]} ${x.chg_pct}%${p?' มีสัญญาณ':''}">
+      ${p && p<=2 ? `<span class="mark" aria-hidden="true">${x.alerts[0].icon}</span>`:""}
+      <span class="s ${x.symbol.length>=8?'long':''}">${esc(x.symbol)}</span>
+      <span><span class="c">${x.chg_pct>0?'+':''}${fmt(x.chg_pct,1)}%</span><br><span class="zn">${SHORT[x.zone]}</span></span>
+    </button>`;}).join("");
+
+  // legend
+  $("#legend").innerHTML = LEGEND.map(g => `<div class="lg-group"><div class="t">${g.t}</div><div class="lg-chips">${
+    g.items.map(it => { const n = items.filter(x=>x.flags[it.k]).length;
+      const vis = it.zone ? `<span class="sw" style="--z:${zc(it.zone)}"></span>` : `<span class="glyph" style="color:${it.color}">${it.glyph}</span>`;
+      return `<button class="chip ${n?'':'zero'}" data-f="${it.k}" aria-pressed="${FILTER===it.k}" title="${esc(it.hint||'')}">${vis}<span>${esc(it.label)}</span><span class="n">${n}</span></button>`;
+    }).join("")}</div></div>`).join("");
+
+  // alert sections
+  const card = x => `<button class="card" data-open="${esc(x.symbol)}" style="--z:${zc(x.zone)}">
+      <span class="bar"></span>
+      <div class="top"><span><span class="sym">${esc(x.symbol)}</span> <span class="muted">${esc(x.name)}</span></span><span class="px">${fmt(x.close,dec(x))} ${pct(x.chg_pct)}</span></div>
+      <ul>${x.alerts.filter(a=>a.p<=2||x.alerts.length<=2).map(a=>`<li><span aria-hidden="true">${a.icon}</span><span>${esc(a.text)}</span></li>`).join("")}</ul>
+      <div class="act">${esc(x.alerts[0].action)}</div></button>`;
+  const act = items.filter(x=>x.alerts[0]?.p===1), watch = items.filter(x=>x.alerts[0]?.p===2);
+  $("#sec-act").innerHTML = act.length ? `<h2>ต้องดูวันนี้</h2><div class="cards">${act.map(card).join("")}</div>` : "";
+  $("#sec-watch").innerHTML = watch.length ? `<h2>จังหวะสะสม</h2><div class="cards">${watch.map(card).join("")}</div>` : "";
+
+  // all rows grouped
+  $("#all").innerHTML = Object.keys(GROUPS).map(g => {
+    const rs = items.filter(x=>x.group===g); if(!rs.length) return "";
+    return `<div class="grp">${GROUPS[g]}</div><div class="rows">${rs.map(x => `
+      <button class="row" data-open="${esc(x.symbol)}" data-sym="${esc(x.symbol)}" style="--z:${zc(x.zone)}">
+        <span class="bar"></span>
+        <span style="min-width:0"><span class="l1"><span class="sym">${esc(x.symbol)}</span><span class="nm">${esc(x.name)}</span></span>
+          <span class="l2"><span>${SHORT[x.zone]} ${x.flags.bullish?'Bullish':'Bearish'}</span><span>RSI ${fmt(x.rsi,0)}</span>${x.srsi_k!=null?`<span>Stoch ${fmt(x.srsi_k,0)}/${fmt(x.srsi_d,0)}</span>`:""}<span>${TREND[x.trend]||x.trend}</span></span>
+          <span class="strip" aria-hidden="true">${x.hist.z.slice(-20).map(z=>`<i style="--z:${zc(z)}"></i>`).join("")}</span></span>
+        <span class="r"><span class="px">${fmt(x.close,dec(x))}</span><br>${pct(x.chg_pct)}</span>
+      </button>`).join("")}</div>`;}).join("");
+
+  $("#foot").innerHTML = `แถบสีเล็กใต้ชื่อหุ้นคือโซน CDC ย้อนหลัง 20 วันทำการ (ขวาสุด = วันนี้)<br>
+    ราคาจาก Yahoo Finance และ set.or.th · DR คำนวณจากหุ้นแม่ (ราคาแสดงเป็นสกุลของหุ้นแม่)<br>
+    CDC ActionZone V3 ตั้งค่า ${esc(d.settings?.cdc||"close 12 26 1")} และ Stoch RSI ${esc(d.settings?.srsi||"3 3 14 14")} ตรงกับ TradingView<br>
+    ระบบนี้ช่วยคัดกรอง ไม่ใช่คำแนะนำการลงทุน`;
+  applyFilter();
+}
+
+function applyFilter(){
+  const items = DATA.items;
+  const match = s => !FILTER || items.find(x=>x.symbol===s)?.flags[FILTER];
+  document.querySelectorAll(".tile").forEach(t => t.classList.toggle("dim", !match(t.dataset.sym)));
+  document.querySelectorAll(".row").forEach(r => r.classList.toggle("hide", !match(r.dataset.sym)));
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.f===FILTER)));
+  const fb = $("#filterbar");
+  if (FILTER){
+    const it = LEGEND.flatMap(g=>g.items).find(i=>i.k===FILTER);
+    const n = items.filter(x=>x.flags[FILTER]).length;
+    $("#filtertext").textContent = `แสดงเฉพาะ ${it.label} (${n} ตัว)`;
+  }
+  fb.classList.toggle("on", !!FILTER);
+}
+
+/* ---------- detail sheet + chart ---------- */
+function openSheet(sym){
+  const x = DATA.items.find(i=>i.symbol===sym); if(!x) return;
+  const cur = x.currency==="pt" ? "จุด" : (x.currency||"");
+  const tags = [
+    `<span class="pill" style="--z:${zc(x.zone)}"><span class="sw"></span>${ZONES[x.zone].en}</span>`,
+    `<span class="pill">${x.flags.bullish?'↗ Bullish':'↘ Bearish'}</span>`,
+    x.flags.buy_alert ? `<span class="pill">▲ Buy Alert วันนี้</span>`:"",
+    x.flags.sell_alert ? `<span class="pill">▼ Sell Alert วันนี้</span>`:"",
+  ].join("");
+  const alerts = x.alerts.length ? `<div class="cards" style="margin-top:4px">${x.alerts.map(a=>
+      `<div class="card" style="--z:${zc(x.zone)}"><span class="bar"></span><div>${a.icon} ${esc(a.text)}</div><div class="act">${esc(a.action)}</div></div>`).join("")}</div>`
+    : `<div class="note" style="margin-top:0">${x.stale ? "ยังไม่มีแท่งใหม่ของตลาดนี้ (เช่น ตลาดต่างประเทศปิด) จึงไม่แจ้งสัญญาณซ้ำ" : "วันนี้ไม่มีสัญญาณเปลี่ยน"}</div>`;
+  const notes = [];
+  if (x.group==="dr") notes.push(`คำนวณจากหุ้นแม่ ${esc(x.ticker)} ข้อมูล ณ ราคาปิด ${thDate(x.as_of)}`);
+  if (x.close_only && !(DATA.settings?.cdc||"close").startsWith("close")) notes.push("ดัชนีนี้มีเฉพาะราคาปิด CDC จึงคำนวณจากราคาปิด");
+  $("#sheetbody").innerHTML = `
+    <div class="grab"></div>
+    <div class="sh-head"><div><div class="sym">${esc(x.symbol)}</div><div class="muted">${esc(x.name)}</div></div>
+      <div><div class="px">${fmt(x.close,dec(x))} <span class="muted" style="font-size:13px">${esc(cur)}</span></div><div style="text-align:right">${pct(x.chg_pct)}</div></div></div>
+    <div class="tags">${tags}</div>
+    ${alerts}
+    <h2 style="margin-top:18px">ย้อนหลัง ${x.hist.c.length} วันทำการ</h2>
+    <div class="chart" id="chart"></div>
+    <div class="series-key"><span><i></i>ราคาปิด</span><span><i style="border-top-color:var(--ink-2);border-top-width:1.5px"></i>Fast EMA12</span><span><i style="border-top:1.5px dashed var(--muted)"></i>Slow EMA26</span></div>
+    ${x.hist.k ? `<h2 style="margin-top:18px">Stoch RSI</h2><div class="chart" id="schart"></div>
+    <div class="series-key"><span><i></i>K</span><span><i style="border-top:1.5px dashed var(--muted)"></i>D</span><span>เส้นประจาง = ${SRL()} / ${SRU()}</span></div>` : ""}
+    <dl class="facts">
+      <div><dt>CDC</dt><dd>${x.state==="BUY"?"Buy":"Sell"} ${x.days_in_state<=1?"เริ่มวันนี้":"มาแล้ว "+x.days_in_state+" วัน"}</dd></div>
+      <div><dt>RSI (14)</dt><dd>${fmt(x.rsi,1)}${x.rsi>=70?" ร้อนแรง":x.rsi<=30?" ขายมากเกิน":""}</dd></div>
+      <div><dt>Trend</dt><dd>${TREND[x.trend]||x.trend}</dd></div>
+      <div><dt>EMA50 / EMA200</dt><dd>${fmt(x.ema50,2)} / ${x.ema200==null?"-":fmt(x.ema200,2)}</dd></div>
+      <div><dt>Stoch RSI K / D</dt><dd>${x.srsi_k==null?"-":fmt(x.srsi_k,1)+" / "+fmt(x.srsi_d,1)}${x.srsi_d==null?"":x.srsi_d>=SRU()?" ร้อนแรง":x.srsi_d<=SRL()?" ขายมากเกิน":""}</dd></div>
+      <div><dt>ตั้งค่า</dt><dd style="font-weight:500;font-size:13px">CDC ${esc(DATA.settings?.cdc||"close 12 26 1")}<br>Stoch RSI ${esc(DATA.settings?.srsi||"3 3 14 14")}</dd></div>
+    </dl>
+    <div class="note">${notes.join("<br>")}${notes.length?"<br>":""}แหล่งข้อมูล ${esc(x.source)} (${esc(x.ticker)})</div>
+    <div style="text-align:center;margin-top:16px"><button class="close" id="closesheet">ปิด</button></div>`;
+  const dlg = $("#sheet");
+  dlg.showModal();
+  drawChart($("#chart"), x);
+  if (x.hist.k) drawStoch($("#schart"), x);
+  $("#closesheet").onclick = () => dlg.close();
+}
+
+function drawChart(el, x){
+  const W = Math.max(280, el.clientWidth || 340), H = 210, ZH = 10, padL = 4, padR = 46, padT = 8, padB = 22;
+  const c=x.hist.c, f=x.hist.f, s=x.hist.s, z=x.hist.z, d=x.hist.d, n=c.length;
+  const all=[...c,...f,...s]; let lo=Math.min(...all), hi=Math.max(...all); const pad=(hi-lo)*.06||1; lo-=pad; hi+=pad;
+  const plotH = H - padT - padB - ZH - 6;
+  const X = i => padL + i*(W-padL-padR)/(n-1);
+  const Y = v => padT + (hi-v)/(hi-lo)*plotH;
+  const path = arr => arr.map((v,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join("");
+  const ticks = [hi-pad, (hi+lo)/2, lo+pad];
+  const zy = padT+plotH+6, cw=(W-padL-padR)/n;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟราคาปิด ${esc(x.symbol)} ย้อนหลัง ${n} วัน">
+    ${ticks.map(t=>`<line x1="${padL}" x2="${W-padR}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-width="1"/>
+      <text x="${W-padR+6}" y="${Y(t)+4}" fill="var(--muted)" font-size="11">${fmt(t, t>=100?0:2)}</text>`).join("")}
+    <path d="${path(s)}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <path d="${path(f)}" fill="none" stroke="var(--ink-2)" stroke-width="1.5"/>
+    <path d="${path(c)}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${X(n-1)}" cy="${Y(c[n-1])}" r="4" fill="var(--ink)" stroke="var(--surface)" stroke-width="2"/>
+    ${z.map((zz,i)=>`<rect x="${(padL+i*cw).toFixed(1)}" y="${zy}" width="${Math.max(cw-0.6,0.6).toFixed(2)}" height="${ZH}" fill="var(--${zz})"/>`).join("")}
+    <text x="${padL}" y="${H-4}" fill="var(--muted)" font-size="11">${d[0].slice(5).split("-").reverse().join("/")}</text>
+    <text x="${W-padR}" y="${H-4}" fill="var(--muted)" font-size="11" text-anchor="end">${d[n-1].slice(5).split("-").reverse().join("/")}</text>
+    <line id="xh" y1="${padT}" y2="${zy+ZH}" stroke="var(--ink-2)" stroke-width="1" visibility="hidden"/>
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent" id="hit"/>
+  </svg><div class="tip" id="tip"></div>`;
+  const svg = el.querySelector("svg"), xh = el.querySelector("#xh"), tip = el.querySelector("#tip");
+  const move = ev => {
+    const r = svg.getBoundingClientRect(); const px = (ev.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(n-1, Math.round((px-padL)/((W-padL-padR)/(n-1)))));
+    xh.setAttribute("x1", X(i)); xh.setAttribute("x2", X(i)); xh.setAttribute("visibility","visible");
+    tip.style.display="block";
+    tip.innerHTML = `${d[i].split("-").reverse().join("/")}<br><b>${fmt(c[i],2)}</b> · ${SHORT[z[i]]}`;
+    const left = X(i) * r.width / W; tip.style.left = Math.min(Math.max(0, left - tip.offsetWidth/2), r.width - tip.offsetWidth) + "px";
+  };
+  const hide = () => { xh.setAttribute("visibility","hidden"); tip.style.display="none"; };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", hide);
+}
+
+const SRU = () => DATA.settings?.srsi_upper ?? 80, SRL = () => DATA.settings?.srsi_lower ?? 20;
+function drawStoch(el, x){
+  const W = Math.max(280, el.clientWidth || 340), H = 110, padL = 4, padR = 46, padT = 6, padB = 6;
+  const k = x.hist.k, d = x.hist.sd, n = k.length;
+  const X = i => padL + i*(W-padL-padR)/(n-1), Y = v => padT + (100-v)/100*(H-padT-padB);
+  const path = arr => { let p="", pen=false; arr.forEach((v,i)=>{ if(v==null){pen=false;return;} p += `${pen?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; pen=true; }); return p; };
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="กราฟ Stoch RSI ${esc(x.symbol)}">
+    <rect x="${padL}" y="${Y(SRU())}" width="${W-padL-padR}" height="${Y(SRL())-Y(SRU())}" fill="var(--surface-2)"/>
+    ${[SRU(),SRL()].map(t=>`<line x1="${padL}" x2="${W-padR}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-dasharray="3 3"/>
+      <text x="${W-padR+6}" y="${Y(t)+4}" fill="var(--muted)" font-size="11">${t}</text>`).join("")}
+    <path d="${path(d)}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <path d="${path(k)}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const o = e.target.closest("[data-open]"); if (o) { openSheet(o.dataset.open); return; }
+  const f = e.target.closest("[data-f]"); if (f) { FILTER = FILTER===f.dataset.f ? null : f.dataset.f; applyFilter(); return; }
+  if (e.target.closest("#clearf")) { FILTER=null; applyFilter(); }
+});
+$("#sheet").addEventListener("click", e => { if (e.target.id==="sheet") e.target.close(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !window.__DATA__) boot(true); });
+
+async function boot(quiet){
+  try { DATA = await load(); render(); }
+  catch(err){ if(!quiet){ $("#verdict").innerHTML = `<div class="big">โหลดข้อมูลไม่ได้</div><div class="sub">${esc(err.message)} ลองปิดแล้วเปิดใหม่ หรือรอรอบอัปเดตถัดไปตอน 19:00 น.</div>`; $("#when").textContent=""; } }
+}
+boot();
+</script>
+</body>
+</html>

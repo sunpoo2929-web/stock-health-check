@@ -29,6 +29,18 @@ stocks:
 
 # ===== เกณฑ์การแจ้งเตือน (ปรับได้) =====
 settings:
+  # CDC ActionZone V3 — ตั้งให้ตรงกับ TradingView "CDC ActionZone V3 2020 close 12 26 1"
+  cdc_source: close          # close / ohlc4 / hlc3 / hl2
+  cdc_fast: 12
+  cdc_slow: 26
+  cdc_smooth: 1              # 1 = ไม่ทำให้เรียบ
+  # Stoch RSI — ตรงกับ TradingView "Stoch RSI 3 3 14 14 close"
+  srsi_k: 3
+  srsi_d: 3
+  srsi_rsi_len: 14
+  srsi_stoch_len: 14
+  srsi_upper: 80
+  srsi_lower: 20
   drop_alert_pct: 3.0        # หุ้น: ลง >= 3% ในวันเดียว = ลงแรงผิดปกติ
   drop_alert_pct_index: 2.0  # ดัชนี: ลง >= 2%
   rsi_period: 14
